@@ -1,3 +1,7 @@
+```
+pip install -r .\requirements.txt
+```
+
 Запустить тесты
 ```
 pytest .\tests.py --alluredir=allure-results
