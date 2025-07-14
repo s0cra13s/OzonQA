@@ -1,3 +1,5 @@
+from unittest import result
+
 import pytest
 import allure
 import requests
@@ -236,60 +238,25 @@ class TestFindTallestHero:
     """
     Набор тестов для функции find_tallest_hero.
     """
+    testdata = [
+        ("Male", True, "Nicholas Hubbard"),
+        ("Male", False, "Yvette Brown"),
+        ("Female", True, "Kristine Kelley"),
+        ("Female", False, "Christopher Salas")
+    ]
 
     @pytest.fixture
     def mock_api(self, requests_mock):
         requests_mock.get(API_URL, json=mock_heroes_data)
 
     @allure.story("Поиск по критериям")
-    @allure.title("Найти самого высокого мужчину с работой")
-    def test_find_tallest_male_with_job(self, mock_api):
+    @pytest.mark.parametrize("gender,has_job,result", testdata)
+    def test_find_with_correct_input(self, mock_api, gender, has_job, result):
         """
-        Тест проверяет поиск самого высокого супергероя мужского пола, у которого есть работа.
-        Ожидаемый результат: Nicholas Hubbard (500 cm).
+        Тест проверяет поиск супергероя с правильными параметрами
         """
-        tallest = find_tallest_hero(gender="Male", has_job=True, api_url=API_URL)
-        assert tallest == "Nicholas Hubbard"
-
-    @allure.story("Поиск по критериям")
-    @allure.title("Найти самого высокого мужчину без работы")
-    def test_find_tallest_male_without_job(self, mock_api):
-        """
-        Тест проверяет поиск самого высокого безработного супергероя мужского пола.
-        Ожидаемый результат: Yvette Brown (382 cm).
-        """
-        tallest = find_tallest_hero(gender="Male", has_job=False, api_url=API_URL)
-        assert tallest == "Yvette Brown"
-
-    @allure.story("Поиск по критериям")
-    @allure.title("Найти самую высокую женщину с работой")
-    def test_find_tallest_female_with_job(self, mock_api):
-        """
-        Тест проверяет поиск самой высокой супергероини, у которой есть работа.
-        Ожидаемый результат: Kristine Kelley (773 cm).
-        """
-        tallest = find_tallest_hero(gender="Female", has_job=True, api_url=API_URL)
-        assert tallest == "Kristine Kelley"
-
-    @allure.story("Поиск по критериям")
-    @allure.title("Найти самую высокую женщину без работы")
-    def test_find_tallest_female_without_job(self, mock_api):
-        """
-        Тест проверяет поиск самой высокой безработной супергероини.
-        Ожидаемый результат: Christopher Salas (157 cm).
-        """
-        tallest = find_tallest_hero(gender="Female", has_job=False, api_url=API_URL)
-        assert tallest == "Christopher Salas"
-
-    @allure.story("Граничные случаи")
-    @allure.title("Герой не найден, если пол не соответствует")
-    def test_no_hero_found_for_gender(self, mock_api):
-        """
-        Тест проверяет, что функция возвращает None, если нет героев указанного пола.
-        """
-        # В мок-данных нет героев с гендером 'Unknown'
-        tallest = find_tallest_hero(gender="Unknown", has_job=True, api_url=API_URL)
-        assert tallest is None
+        tallest = find_tallest_hero(gender=gender, has_job=has_job, api_url=API_URL)
+        assert tallest == result
 
     @allure.story("Граничные случаи")
     @allure.title("Герой не найден, если статус работы не соответствует")
